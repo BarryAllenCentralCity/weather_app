@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 class LayoutPage extends StatefulWidget {
@@ -35,9 +32,10 @@ class _LayoutPageState extends State<LayoutPage> {
           centerTitle: true,
           backgroundColor: Colors.black12,
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        body: SingleChildScrollView(
+          child: Column(
           children: <Widget>[
+            SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -52,11 +50,13 @@ class _LayoutPageState extends State<LayoutPage> {
                       labelText: 'Enter Location',
                     ),
                   ),
+
                 ),
                 Container(
                   child: GestureDetector(
                     onTap: () {
                       setLocation(location);
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                     child: Image.asset(
                       'lib/assets/search.png',
@@ -69,8 +69,8 @@ class _LayoutPageState extends State<LayoutPage> {
               ],
             ),
             Container(
-              height: 250,
-              width: 300,
+              height: 300,
+              width: double.infinity,
               padding: EdgeInsets.all(20.0),
               margin: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
@@ -80,6 +80,7 @@ class _LayoutPageState extends State<LayoutPage> {
                 ),
               ),
             ),
+            SizedBox(height: 15,),
             Text(
               weatherCondition,
               style: TextStyle(fontSize: 24, ),        
@@ -89,6 +90,7 @@ class _LayoutPageState extends State<LayoutPage> {
               temperature,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 25,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -126,6 +128,7 @@ class _LayoutPageState extends State<LayoutPage> {
               ],
             )
           ],
+        ),
         ),
       ),
     );
@@ -200,6 +203,10 @@ class _LayoutPageState extends State<LayoutPage> {
 
   void setLocation(String locationName) {
     locationName = locationName.replaceAll(" ", "+");
+    if(locationName[locationName.length-1] == "+"){
+      locationName = locationName.substring(0, locationName.length - 1);
+    }
+
 
     String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" +
         locationName +
@@ -212,7 +219,6 @@ class _LayoutPageState extends State<LayoutPage> {
         var result = data[0] as Map<String, dynamic>;
         double latitude = result['latitude'];
         double longitude = result['longitude'];
-        // TODO: Extract latitude and longitude from the response
         fetchWeatherData(latitude, longitude);
       } else {
         print(
